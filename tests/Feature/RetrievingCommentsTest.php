@@ -31,7 +31,7 @@ class RetrievingCommentsTest extends TestCase
         $comment3 = factory(Comment::class)->create($datas);
         $this->assertEquals(3, Comment::count());
 
-        $response = $this->json('GET', '/comments', ['type' => 'App\Models\Post', 'id' => $post->id ]);
+        $response = $this->json('GET', '/comments', ['type' => get_class($post), 'id' => $post->id ]);
 
         $this->assertEquals(200, $response->getStatusCode());
         $comments = json_decode($response->getContent());
@@ -56,7 +56,7 @@ class RetrievingCommentsTest extends TestCase
         $comment2 = factory(Comment::class)->create($datas);
         $reply = factory(Comment::class)->create(array_merge($datas, ['reply_to' => $comment1->id]));
 
-        $response = $this->json('GET', '/comments', ['type' => 'App\Models\Post', 'id' => $post->id ]);
+        $response = $this->json('GET', '/comments', ['type' => get_class($post), 'id' => $post->id ]);
 
         $this->assertEquals(200, $response->getStatusCode());
         $comments = json_decode($response->getContent());
@@ -97,7 +97,7 @@ class RetrievingCommentsTest extends TestCase
             array_merge($datas, ['created_at'=> Carbon::now()->sub('3 hours')])
         );
 
-        $response = $this->json('GET', '/comments', ['type' => 'App\Models\Post', 'id' => $post->id ]);
+        $response = $this->json('GET', '/comments', ['type' => get_class($post), 'id' => $post->id ]);
 
         $this->assertEquals(200, $response->getStatusCode());
         $comments = json_decode($response->getContent());
@@ -132,7 +132,7 @@ class RetrievingCommentsTest extends TestCase
             'created_at' => Carbon::now()->sub('2 hours')
         ]));
 
-        $response = $this->json('GET', '/comments', ['type' => 'App\Models\Post', 'id' => $post->id ]);
+        $response = $this->json('GET', '/comments', ['type' => get_class($post), 'id' => $post->id ]);
 
         $this->assertEquals(200, $response->getStatusCode());
         $comments = json_decode($response->getContent());
@@ -147,6 +147,6 @@ class RetrievingCommentsTest extends TestCase
         $this->assertSame(md5($comment1->email), $comments[0]->email_md5);
 
 
-        dump($comments[0]);
+        //dump($comments[0]);
     }
 }
