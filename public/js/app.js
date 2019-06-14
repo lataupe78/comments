@@ -1697,6 +1697,7 @@ module.exports = {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _CommentFormComponent_vue__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./CommentFormComponent.vue */ "./resources/js/components/CommentFormComponent.vue");
 //
 //
 //
@@ -1724,7 +1725,21 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+
 /* harmony default export */ __webpack_exports__["default"] = ({
+  components: {
+    commentForm: _CommentFormComponent_vue__WEBPACK_IMPORTED_MODULE_0__["default"]
+  },
   name: 'comment',
   props: {
     comment: Object,
@@ -1733,6 +1748,11 @@ __webpack_require__.r(__webpack_exports__);
       type: Boolean,
       "default": false
     }
+  },
+  data: function data() {
+    return {
+      showForm: false
+    };
   },
   computed: {
     isAReply: function isAReply() {
@@ -1803,6 +1823,7 @@ __webpack_require__.r(__webpack_exports__);
   methods: {
     sendForm: function sendForm() {
       console.log(this.form);
+      axios.post;
     }
   }
 });
@@ -37223,6 +37244,23 @@ var render = function() {
                   [_vm._v("Editer")]
                 )
               ])
+            : _vm._e(),
+          _vm._v(" "),
+          !_vm.isAReply
+            ? _c("div", { staticClass: "actions ml-auto" }, [
+                _c(
+                  "button",
+                  {
+                    staticClass: "btn btn-sm btn-success mr-0 mb-1",
+                    on: {
+                      click: function($event) {
+                        _vm.showForm = !_vm.showForm
+                      }
+                    }
+                  },
+                  [_vm._v("Répondre")]
+                )
+              ])
             : _vm._e()
         ]
       ),
@@ -37230,6 +37268,24 @@ var render = function() {
       _c("div", { staticClass: "py-2" }, [
         _vm._v("\n\t\t" + _vm._s(_vm.comment.content) + "\n\t")
       ]),
+      _vm._v(" "),
+      !_vm.isAReply
+        ? _c("comment-form", {
+            directives: [
+              {
+                name: "show",
+                rawName: "v-show",
+                value: _vm.showForm,
+                expression: "showForm"
+              }
+            ],
+            attrs: {
+              id: _vm.comment.commentable_id,
+              model: _vm.comment.commentable_type,
+              reply: _vm.comment.id
+            }
+          })
+        : _vm._e(),
       _vm._v(" "),
       _vm._l(_vm.comment.replies, function(comment, index) {
         return !_vm.isAReply
@@ -37265,7 +37321,7 @@ var render = function() {
   var _vm = this
   var _h = _vm.$createElement
   var _c = _vm._self._c || _h
-  return _c("div", [
+  return _c("div", { staticClass: "my-2" }, [
     _c("div", { staticClass: "form-group row" }, [
       _c(
         "label",
@@ -37375,7 +37431,7 @@ var render = function() {
       _c(
         "button",
         { staticClass: "btn btn-primary ml-auto", on: { click: _vm.sendForm } },
-        [_vm._v("Envoyer")]
+        [_vm._v(_vm._s(_vm.reply === null ? "Commenter" : "Répondre"))]
       )
     ])
   ])

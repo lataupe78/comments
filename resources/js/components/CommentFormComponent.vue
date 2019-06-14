@@ -1,5 +1,5 @@
 <template>
-	<div>
+	<div class="my-2">
 		<div class="form-group row">
 			<label for="username" class="col-form-label col-md-3 text-md-right">Pseudo</label>
 			<div class="col-md-9">
@@ -20,7 +20,7 @@
 		</div>
 
 		<div class="actions d-flex py-2">
-			<button class="btn btn-primary ml-auto" @click="sendForm">Envoyer</button>
+			<button class="btn btn-primary ml-auto" @click="sendForm">{{ (reply === null) ? 'Commenter' : 'Répondre' }}</button>
 		</div>
 
 	</div>
@@ -56,6 +56,7 @@
 
 				console.log(this.form)
 
+				axios.post
 			}
 		}
 
