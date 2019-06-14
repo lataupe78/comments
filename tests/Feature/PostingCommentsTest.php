@@ -38,4 +38,24 @@ class PostingCommentsTest extends TestCase
         $this->assertSame(null, $content->reply_to);
 
     }
+
+    /** @test */
+    public function a_user_cannot_post_comments_on_inexisting_post()
+    {
+         $post = factory(Post::class)->create();
+        $datas = [
+            'commentable_type' => get_class($post),
+            'commentable_id' => 40
+        ];
+
+        $comment = factory(Comment::class)->make($datas)->getAttributes();
+
+        // on force la réponse en json
+        $response = $this->json('POST', '/comments', $comment);
+
+        $content = json_decode($response->getContent());
+
+        $this->assertEquals(422, $response->getStatusCode());
+        $this->assertEquals(0, Comment::count());
+    }
 }

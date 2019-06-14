@@ -4,11 +4,17 @@
 <div class="container">
 
 	<div class="card">
-
 		<div class="card-header">
 			<h1>{{ $post->title }}</h1>
 		</div>
+		<div class="card-footer">
+			<p>
+				<a href="{{ route('posts.index') }}">Retour</a>
+			</p>
+		</div>
+	</div>
 
+	<div class="card">
 		<div class="card-body">
 			<p>
 				<small class="text-muted">{{ $post->created_at->diffForHumans()}}</small>

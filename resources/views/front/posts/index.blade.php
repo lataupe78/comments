@@ -21,6 +21,9 @@
 				@endforeach
 			</div>
 		</div>
+		<div class="card-footer">
+			{{ $posts->links() }}
+		</div>
 	</div>
 </div>
 

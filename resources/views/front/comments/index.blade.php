@@ -12,6 +12,8 @@
 	</div>
 	<div class="card-body">
 		{{ $comment->content }}
+
+
 	</div>
 </div>
 @endforeach
