@@ -1,10 +1,10 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="container">
+<div class="container py-5">
 
 	<div class="card">
-		<div class="card-header">
+		<div class="card-body">
 			<h1>{{ $post->title }}</h1>
 		</div>
 		<div class="card-footer">
@@ -19,14 +19,26 @@
 			<p>
 				<small class="text-muted">{{ $post->created_at->diffForHumans()}}</small>
 			</p>
-			{{ $post->content }}
-		</div>
-
-		<div class="card-footer">
-			@include('front.comments._list', ['comments' => $post->comments])
+			{!! nl2br($post->content) !!}
 		</div>
 	</div>
 
+
+	<div class="card my-5 text-white bg-primary">
+		@include('front.comments._list', ['comments' => $post->comments])
+	</div>
+
+	<comments
+		model="{{ get_class($post) }}"
+		:id="{{ $post->id }}"
+		:comments="{{$post->comments }}"
+		ip="{{ md5(request()->ip()) }}" />
+
+
 </div>
 
+@endsection
+
+@section('content_bottom')
+	{{ dump($post->comments) }}
 @endsection

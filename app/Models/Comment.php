@@ -12,6 +12,9 @@ class Comment extends Model
 		'reply_to' => 'integer'
 	];
 
+	protected $with = 'replies';
+
+
 	protected $hidden = ['email', 'ip'];
 
 	protected $appends = ['email_md5', 'ip_md5'];

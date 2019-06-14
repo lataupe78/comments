@@ -7,10 +7,12 @@ $is_reply = $is_reply ?? false;
 </div>
 @endif
 
+
+
 @foreach($comments as $comment)
 
 @if(($comment->reply_to === null && !$is_reply) || $is_reply)
-<div class="card{{ ($is_reply) ? ' ml-5' : '' }}">
+
 	<div class="card-header">
 		<p class="my-0">
 			<span class="text-muted">{{ $comment->id }}</span>
@@ -18,7 +20,7 @@ $is_reply = $is_reply ?? false;
 		</p>
 	</div>
 
-	<div class="card-body">
+	<div class="card-body {{ ($is_reply) ? ' ml-5' : '' }}">
 		{{-- dump($comment->reply_to) --}}
 		<div class="mb-2">{{ $comment->content }}</div>
 
@@ -30,7 +32,7 @@ $is_reply = $is_reply ?? false;
 		@endif
 
 	</div>
-</div>
+
 @endif
 
 @endforeach
