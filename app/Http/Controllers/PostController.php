@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Post;
+use App\Models\Post;
 use Illuminate\Http\Request;
 
 class PostController extends Controller
@@ -14,7 +14,9 @@ class PostController extends Controller
      */
     public function index()
     {
-        //
+        $posts = Post::paginate(10);
+
+        return view('front.posts.index', ['posts' => $posts]);
     }
 
     /**
@@ -46,7 +48,13 @@ class PostController extends Controller
      */
     public function show(Post $post)
     {
-        //
+
+        $post->load('comments');
+        //return $post;
+
+        return view('front.posts.show', [
+            'post' => $post
+        ]);
     }
 
     /**

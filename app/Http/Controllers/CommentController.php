@@ -3,8 +3,10 @@
 namespace App\Http\Controllers;
 
 
+use App\Http\Requests\StoreCommentRequest;
 use App\Models\Comment;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 
 class CommentController extends Controller
 {
@@ -20,7 +22,13 @@ class CommentController extends Controller
             $request->input('type')
         )->get();
 
-        return $comments;
+        if(request()->expectsJson()){
+            return response()->json($comments, 200, [], JSON_NUMERIC_CHECK);
+        }
+
+        return view('front.comments.index', [
+            'comments' => $comments
+        ]);
     }
 
     /**
@@ -39,8 +47,25 @@ class CommentController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(StoreCommentRequest $request)
     {
+        $data = $request->validated();
+
+        $comment = Comment::create([
+            'commentable_type' => $data['commentable_type'],
+            'commentable_id' => $data['commentable_id'],
+            'username' => $data['username'],
+            'email' => $data['email'],
+            'content' => $data['content'],
+            'reply_to' => $data['reply_to'] ?? null,
+            'ip' => request()->ip(),
+        ]);
+
+        if(request()->expectsJson()){
+            return response()->json($comment, 200, [], JSON_NUMERIC_CHECK);
+        }
+
+        return redirect()->route('comments.index');
     }
 
     /**

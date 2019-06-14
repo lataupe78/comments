@@ -25,12 +25,13 @@ class RetrievingCommentsTest extends TestCase
             'commentable_type' => get_class($post),
             'commentable_id' => $post->id
         ];
+
         $comment1 = factory(Comment::class)->create($datas);
         $comment2 = factory(Comment::class)->create($datas);
         $comment3 = factory(Comment::class)->create($datas);
         $this->assertEquals(3, Comment::count());
 
-        $response = $this->call('GET', '/comments', ['type' => 'App\Models\Post', 'id' => $post->id ]);
+        $response = $this->json('GET', '/comments', ['type' => 'App\Models\Post', 'id' => $post->id ]);
 
         $this->assertEquals(200, $response->getStatusCode());
         $comments = json_decode($response->getContent());
@@ -55,7 +56,7 @@ class RetrievingCommentsTest extends TestCase
         $comment2 = factory(Comment::class)->create($datas);
         $reply = factory(Comment::class)->create(array_merge($datas, ['reply_to' => $comment1->id]));
 
-        $response = $this->call('GET', '/comments', ['type' => 'App\Models\Post', 'id' => $post->id ]);
+        $response = $this->json('GET', '/comments', ['type' => 'App\Models\Post', 'id' => $post->id ]);
 
         $this->assertEquals(200, $response->getStatusCode());
         $comments = json_decode($response->getContent());
@@ -96,7 +97,7 @@ class RetrievingCommentsTest extends TestCase
             array_merge($datas, ['created_at'=> Carbon::now()->sub('3 hours')])
         );
 
-        $response = $this->call('GET', '/comments', ['type' => 'App\Models\Post', 'id' => $post->id ]);
+        $response = $this->json('GET', '/comments', ['type' => 'App\Models\Post', 'id' => $post->id ]);
 
         $this->assertEquals(200, $response->getStatusCode());
         $comments = json_decode($response->getContent());
@@ -131,7 +132,7 @@ class RetrievingCommentsTest extends TestCase
             'created_at' => Carbon::now()->sub('2 hours')
         ]));
 
-        $response = $this->call('GET', '/comments', ['type' => 'App\Models\Post', 'id' => $post->id ]);
+        $response = $this->json('GET', '/comments', ['type' => 'App\Models\Post', 'id' => $post->id ]);
 
         $this->assertEquals(200, $response->getStatusCode());
         $comments = json_decode($response->getContent());

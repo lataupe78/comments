@@ -41,4 +41,9 @@ class Comment extends Model
 	public function getIpMd5Attribute(){
 		return md5($this->ip);
 	}
+
+	public function commentable()
+    {
+        return $this->morphTo();
+    }
 }

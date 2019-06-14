@@ -17,5 +17,10 @@ Route::get('/', function () {
 
 
 Route::group(['middleware' => ['web']], function(){
+	Route::resource('posts', 'PostController');
 	Route::resource('comments', 'CommentController');
 });
+
+Auth::routes();
+
+Route::get('/home', 'HomeController@index')->name('home');

@@ -24,11 +24,12 @@ class StoreCommentRequest extends FormRequest
     public function rules()
     {
         return [
-
-            'email' => 'required|email',
-            'username' => 'required',
+            'email' => ['required', 'email'],
             'content' => 'required',
-
+            'username' => 'required',
+            'commentable_type' => 'required',
+            'commentable_id' => 'required',
+            'reply_to' => ''
         ];
     }
 }

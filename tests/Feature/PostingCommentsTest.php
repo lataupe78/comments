@@ -16,15 +16,26 @@ class PostingCommentsTest extends TestCase
     /** @test */
     public function a_user_can_post_comments()
     {
+        $this->withoutExceptionHandling();
+
         $post = factory(Post::class)->create();
         $datas = [
             'commentable_type' => get_class($post),
             'commentable_id' => $post->id
         ];
-        $comment = factory(Comment::class)->make($datas);
 
-        $response = $this->call('POST', '/comments', $comment->toArray());
+        $comment = factory(Comment::class)->make($datas)->getAttributes();
 
+        // on force la réponse en json
+        $response = $this->json('POST', '/comments', $comment);
+
+        $content = json_decode($response->getContent());
+
+        $this->assertEquals(200, $response->getStatusCode());
         $this->assertEquals(1, Comment::count());
+
+        $this->assertSame(md5(request()->ip()), $content->ip_md5);
+        $this->assertSame(null, $content->reply_to);
+
     }
 }
