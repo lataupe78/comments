@@ -16,6 +16,10 @@
             <h2>
                 <a href="{{ route('posts.index') }}">Liste des Posts</a>
             </h2>
+
+            <p>csrf_token for Testing under Postman / Insomnia:
+                <span class="h5">{{ csrf_token() }}</span>
+            </p>
         </div>
     </div>
 

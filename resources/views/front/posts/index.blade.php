@@ -12,7 +12,10 @@
 			<div class="list group">
 				@foreach($posts as $post)
 				<div class="list-group-item">
-					<small class="text-muted">{{ $post->created_at->diffForHumans()}}</small>
+					<small class="text-muted">
+						#{{ $post->id }} -
+						{{ $post->created_at->diffForHumans()}}
+					</small>
 					<h2>
 						<a href="{{ route('posts.show', $post) }}">{{ $post->title }}</a>
 					</h2>

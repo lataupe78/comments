@@ -13,7 +13,7 @@ class CommentSeeder extends Seeder
 
 		foreach ($posts as $post) {
 
-			for($i=0; $i<$faker->numberBetween(3, 6); $i++ ){
+			for($i=0; $i<$faker->numberBetween(1, 3); $i++ ){
 
 
 				$comment = factory(Comment::class)->create([
@@ -22,7 +22,7 @@ class CommentSeeder extends Seeder
 				]);
 
 				if(mt_rand(0, 10) > 3){
-					$reply = factory(Comment::class, $faker->numberBetween(1, 3))->create([
+					$reply = factory(Comment::class, $faker->numberBetween(1, 2))->create([
 						'commentable_type' => get_class($post),
 						'commentable_id' => $post->id,
 						'reply_to' => $comment->id

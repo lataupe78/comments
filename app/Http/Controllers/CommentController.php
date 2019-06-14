@@ -10,11 +10,7 @@ use Illuminate\Http\Response;
 
 class CommentController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
+
     public function index(Request $request)
     {
         $comments = Comment::allFor(
@@ -31,24 +27,11 @@ class CommentController extends Controller
         ]);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        //
-    }
 
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
     public function store(StoreCommentRequest $request)
     {
+
+
         $data = $request->validated();
 
         $comment = Comment::create([
@@ -61,55 +44,44 @@ class CommentController extends Controller
             'ip' => request()->ip(),
         ]);
 
-        if(request()->expectsJson()){
+        if(request()->wantsJson()){
             return response()->json($comment, 200, [], JSON_NUMERIC_CHECK);
         }
 
-        return redirect()->route('comments.index');
+        return redirect()->route('posts.index')->with('success', __('comment.created.success'));
+
     }
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  \App\Comment  $comment
-     * @return \Illuminate\Http\Response
-     */
-    public function show(Comment $comment)
-    {
-        //
-    }
 
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  \App\Comment  $comment
-     * @return \Illuminate\Http\Response
-     */
-    public function edit(Comment $comment)
-    {
-        //
-    }
 
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Comment  $comment
-     * @return \Illuminate\Http\Response
-     */
     public function update(Request $request, Comment $comment)
     {
-        //
+
     }
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  \App\Comment  $comment
-     * @return \Illuminate\Http\Response
-     */
+
     public function destroy(Comment $comment)
     {
-        //
+        if($comment->ip === request()->ip()){
+
+            //dump($comment);
+
+            $replies = Comment::where([
+                'reply_to' =>  $comment->id,
+                'commentable_type' => $comment->commentable_type,
+                'commentable_id' => $comment->commentable_id,
+            ])->delete();
+
+            $comment->delete();
+
+            if(request()->expectsJson()){
+                return response()->json($comment, 200, [], JSON_NUMERIC_CHECK);
+            }
+            return redirect()->route('comments.index')->with('success', __('comment.destroy.success'));
+        }
+        if(request()->expectsJson()){
+            return response()->json(__('comment.destroy.fail'), 403, [], JSON_NUMERIC_CHECK);
+        }
+        return redirect()->route('comments.index')->with('success', __('comment.destroy.fail'));
     }
 }
