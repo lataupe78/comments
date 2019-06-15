@@ -59,6 +59,7 @@ class PostingCommentsTest extends TestCase
     {
         $post = factory(Post::class)->create();
 
+
         $comment = factory(Comment::class)->create([
             'commentable_type' => get_class($post),
             'commentable_id' => $post->id,
@@ -83,11 +84,19 @@ class PostingCommentsTest extends TestCase
     public function a_user_cannot_reply_to_an_existent_reply()
     {
         $post = factory(Post::class)->create();
+        //dump('post: #'.$post->id);
+
+        $junk_comment = factory(Comment::class)->create([
+            'commentable_type' => get_class($post),
+            'commentable_id' => $post->id,
+        ]);
+        //dump('comment1: #'.$comment1->id);
 
         $comment = factory(Comment::class)->create([
             'commentable_type' => get_class($post),
             'commentable_id' => $post->id,
         ]);
+        //dump('comment: #'.$comment->id);
 
         $reply = factory(Comment::class)->create([
             'commentable_type' => get_class($post),
@@ -95,6 +104,8 @@ class PostingCommentsTest extends TestCase
             'content' => "Reply to comment #{$comment->id}",
             'reply_to' => $comment->id
         ]);
+
+        //dump('reply 1  to comment : #'.$reply->id);
 
         $reply2 = factory(Comment::class)->make([
             'commentable_type' => get_class($post),
@@ -115,7 +126,7 @@ class PostingCommentsTest extends TestCase
         dump($comments);
         */
 
-        $this->assertEquals(2, Comment::count());
+        $this->assertEquals(3, Comment::count());
         $this->assertEquals(422, $response->getStatusCode());
 
         $this->assertObjectHasAttribute('errors', $content);
@@ -128,6 +139,8 @@ class PostingCommentsTest extends TestCase
     /** @test */
     public function a_user_cannot_reply_to_non_existent_comment()
     {
+        //$this->withoutExceptionHandling();
+
         $post = factory(Post::class)->create();
         $comment = factory(Comment::class)->make([
             'commentable_type' => get_class($post),

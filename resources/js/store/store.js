@@ -52,16 +52,20 @@ const store = new Vuex.Store({
 	actions: {
 
 		addComments: function(context, comments){
-			console.log('store action addComments', comments)
+			//console.log('store action addComments', comments)
 			context.commit('ADD_COMMENTS', comments)
 		},
 
 
 		addComment: function(context, comment) {
-
-			console.log('store action addComment', comment)
+			//console.log('store action addComment', comment)
 			context.commit('ADD_COMMENT', comment)
-		}
+		},
+
+		deleteComment: function(context, comment){
+			//console.log('store action addComments', comments)
+			context.commit('DELETE_COMMENT', comment)
+		},
 	}
 
 });

@@ -1745,22 +1745,26 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 
-var options = {
-  container: '#container',
-  easing: 'ease-in',
-  offset: -60,
-  force: true,
-  cancelable: true,
-  onStart: function onStart(element) {// scrolling started
-  },
-  onDone: function onDone(element) {// scrolling is done
-  },
-  onCancel: function onCancel() {// scrolling has been interrupted
-  },
-  x: false,
-  y: true
-};
 /* harmony default export */ __webpack_exports__["default"] = ({
   components: {
     commentForm: _CommentFormComponent_vue__WEBPACK_IMPORTED_MODULE_0__["default"]
@@ -1776,7 +1780,8 @@ var options = {
   },
   data: function data() {
     return {
-      showForm: false
+      showForm: false,
+      isLoading: false
     };
   },
   methods: {
@@ -1787,6 +1792,22 @@ var options = {
         console.log('looking for #form_' + +this.comment.id);
         this.$nextTick(function () {
           this.$scrollTo("#form_" + this.comment.id); // document.location.hash = "#form_" + this.comment.id
+        });
+      }
+    },
+    deleteComment: function deleteComment() {
+      var _this = this;
+
+      if (confirm("Confirmez la suppression du commentaire:\r\n\r\n" + '#' + this.comment.id + "\r\n" + this.comment.content)) {
+        this.isLoading = true;
+        axios["delete"]('/comments/' + this.comment.id).then(function (response) {
+          _this.$store.dispatch('deleteComment', response.data);
+
+          _this.isLoading = false;
+        })["catch"](function (error) {
+          _this.isLoading = false;
+          var errorObject = JSON.parse(JSON.stringify(error));
+          console.error(errorObject);
         });
       }
     }
@@ -1965,9 +1986,6 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
-//
-//
-//
 
 
 /* harmony default export */ __webpack_exports__["default"] = ({
@@ -1998,28 +2016,50 @@ __webpack_require__.r(__webpack_exports__);
   data: function data() {
     return {
       isLoading: false,
+      isLoaded: false,
       comments: this.$store.getters.comments
     };
   },
   mounted: function mounted() {
     var _this = this;
 
-    console.log('Comments mounted');
-    console.log(this.$store);
-    this.isLoading = true;
-    axios.get('/comments', {
-      params: {
-        id: this.id,
-        type: this.model
-      }
-    }).then(function (response) {
-      //this.comments = response.data
-      //this.addComments(response.data)
-      //this.$store.dispatch('ADD_COMMENTS', response.data)
-      _this.$store.dispatch('addComments', response.data);
+    console.log('Comments mounted'); //console.log(this.$store)
 
-      _this.isLoading = false;
-    });
+    var onScroll = function onScroll() {
+      if (_this.isLoaded === false && _this.$el.getBoundingClientRect().top - window.innerHeight <= 0) {
+        _this.isLoaded = true;
+
+        _this.loadComments();
+
+        window.removeEventListener('scroll', onScroll);
+      }
+    };
+
+    window.addEventListener('scroll', onScroll);
+  },
+  methods: {
+    loadComments: function loadComments() {
+      var _this2 = this;
+
+      this.isLoading = true;
+      axios.get('/comments', {
+        params: {
+          id: this.id,
+          type: this.model
+        }
+      }).then(function (response) {
+        //this.comments = response.data
+        //this.addComments(response.data)
+        //this.$store.dispatch('ADD_COMMENTS', response.data)
+        _this2.$store.dispatch('addComments', response.data);
+
+        _this2.isLoading = false;
+      })["catch"](function (error) {
+        _this2.isLoading = false;
+        var errorObject = JSON.parse(JSON.stringify(error));
+        console.error(errorObject);
+      });
+    }
   }
 });
 
@@ -6482,7 +6522,7 @@ exports = module.exports = __webpack_require__(/*! ../../../node_modules/css-loa
 
 
 // module
-exports.push([module.i, "\n.actions {\n\t\ttext-align: right\n}\n.actions .btn {\n\tfont-size: .64rem !important;\n\tmargin-bottom: .5rem;\n\tmargin-left: .25rem;\n}\n", ""]);
+exports.push([module.i, "\n.actions {\r\n\ttext-align: right\n}\n.actions .btn {\r\n\tfont-size: .64rem !important;\r\n\tmargin-bottom: .5rem;\r\n\tmargin-left: .25rem;\n}\n.avatar {\r\n\tmax-height: 48px;\r\n\twidth: auto;\n}\n.comment-content {\r\n\t/*white-space: pre;*/\n}\n.fade-from-right-enter-active, .fade-from-right-leave-active {\r\n\t\topacity: 1;\r\n\t\ttransition: all 0.3s !important;\r\n\t\ttransform: translateX(0) !important;\n}\n.fade-from-right-enter, .fade-from-right-leave-to {\r\n\t\topacity: 0;\r\n\t\ttransform: translateX(64px) !important;\n}\r\n", ""]);
 
 // exports
 
@@ -38009,92 +38049,137 @@ var render = function() {
   var _h = _vm.$createElement
   var _c = _vm._self._c || _h
   return _c(
-    "div",
-    { staticClass: "list-group-item", class: { "pl-5 pr-0": _vm.isAReply } },
+    "transition",
+    { attrs: { type: "transition", name: "fade-from-right" } },
     [
       _c(
         "div",
-        { staticClass: "w-100 d-flex align-items-center py-2 border-bottom" },
+        {
+          staticClass: "list-group-item",
+          class: { "pl-5 pr-0": _vm.isAReply }
+        },
         [
-          _c("div", [
-            _c("small", { staticClass: "text-muted mr-1" }, [
-              _vm._v(_vm._s(_vm.comment.created_at) + ",")
-            ]),
+          _c("div", { staticClass: "w-100 d-flex align-items-start" }, [
+            _c("img", {
+              staticClass: "rounded-circle mr-2 avatar",
+              attrs: {
+                src: "http://www.gravatar.com/avatar/" + _vm.comment.email_md5,
+                alt: _vm.comment.username
+              }
+            }),
             _vm._v(" "),
-            _c("strong", [_vm._v(_vm._s(_vm.comment.username))]),
-            _vm._v(" a dit:\n\t\t")
+            _c("div", { staticClass: "comment w-100" }, [
+              _c(
+                "div",
+                {
+                  staticClass:
+                    "d-flex align-items-center w-100 py-2 border-bottom"
+                },
+                [
+                  _c("div", { staticClass: "comment-meta mr-auto" }, [
+                    _c("small", { staticClass: "text-muted mr-1" }, [
+                      _vm._v(_vm._s(_vm.comment.created_at) + ",")
+                    ]),
+                    _vm._v(" "),
+                    _c("strong", [_vm._v(_vm._s(_vm.comment.username))]),
+                    _vm._v(" a dit:\n\t\t\t\t\t\t"),
+                    _vm.isLoading
+                      ? _c(
+                          "div",
+                          {
+                            staticClass: "spinner-border mx-4",
+                            attrs: { role: "status" }
+                          },
+                          [
+                            _c("span", { staticClass: "sr-only" }, [
+                              _vm._v("Loading...")
+                            ])
+                          ]
+                        )
+                      : _vm._e()
+                  ]),
+                  _vm._v(" "),
+                  _c("div", { staticClass: "actions ml-auto" }, [
+                    _vm.canEdit
+                      ? _c(
+                          "button",
+                          {
+                            staticClass: "btn btn-sm btn-outline-danger",
+                            on: { click: _vm.deleteComment }
+                          },
+                          [_vm._v("Supprimer")]
+                        )
+                      : _vm._e(),
+                    _vm._v(" "),
+                    _vm.canEdit
+                      ? _c(
+                          "button",
+                          { staticClass: "btn btn-sm btn-outline-primary" },
+                          [_vm._v("Editer")]
+                        )
+                      : _vm._e(),
+                    _vm._v(" "),
+                    !_vm.isAReply
+                      ? _c(
+                          "button",
+                          {
+                            staticClass: "btn btn-sm btn-outline-success",
+                            on: { click: _vm.toggleShowForm }
+                          },
+                          [_vm._v("Répondre")]
+                        )
+                      : _vm._e()
+                  ])
+                ]
+              ),
+              _vm._v(" "),
+              _c("div", { staticClass: "comment-content py-2" }, [
+                _vm._v("\n\t\t\t\t" + _vm._s(_vm.comment.content) + "\n\t\t\t")
+              ])
+            ])
           ]),
           _vm._v(" "),
-          _c("div", { staticClass: "actions ml-auto" }, [
-            _vm.canEdit
-              ? _c("button", { staticClass: "btn btn-sm btn-danger" }, [
-                  _vm._v("Supprimer")
-                ])
-              : _vm._e(),
-            _vm._v(" "),
-            _vm.canEdit
-              ? _c("button", { staticClass: "btn btn-sm btn-primary" }, [
-                  _vm._v("Editer")
-                ])
-              : _vm._e(),
-            _vm._v(" "),
-            !_vm.isAReply
-              ? _c(
-                  "button",
+          _vm.comment.replies
+            ? _c(
+                "div",
+                { staticClass: "list-group list-group-flush" },
+                _vm._l(_vm.comment.replies, function(comment, index) {
+                  return _c("comment", {
+                    key: index,
+                    attrs: { ip: _vm.ip, comment: comment, isReply: true }
+                  })
+                }),
+                1
+              )
+            : _vm._e(),
+          _vm._v(" "),
+          !_vm.isAReply
+            ? _c("comment-form", {
+                directives: [
                   {
-                    staticClass: "btn btn-sm btn-success",
-                    on: { click: _vm.toggleShowForm }
-                  },
-                  [_vm._v("Répondre")]
-                )
-              : _vm._e()
-          ])
-        ]
-      ),
-      _vm._v(" "),
-      _c("div", { staticClass: "py-2" }, [
-        _vm._v("\n\t\t" + _vm._s(_vm.comment.content) + "\n\t")
-      ]),
-      _vm._v(" "),
-      _vm.comment.replies
-        ? _c(
-            "div",
-            { staticClass: "list-group list-group-flush" },
-            _vm._l(_vm.comment.replies, function(comment, index) {
-              return _c("comment", {
-                key: index,
-                attrs: { ip: _vm.ip, comment: comment, isReply: true }
+                    name: "show",
+                    rawName: "v-show",
+                    value: _vm.showForm === true,
+                    expression: "showForm === true"
+                  }
+                ],
+                attrs: {
+                  id: _vm.comment.commentable_id,
+                  model: _vm.comment.commentable_type,
+                  reply: _vm.comment.id,
+                  anchor: "form_" + _vm.comment.id
+                },
+                on: {
+                  cancelEdit: function($event) {
+                    _vm.showForm = false
+                  }
+                }
               })
-            }),
-            1
-          )
-        : _vm._e(),
-      _vm._v(" "),
-      !_vm.isAReply
-        ? _c("comment-form", {
-            directives: [
-              {
-                name: "show",
-                rawName: "v-show",
-                value: _vm.showForm === true,
-                expression: "showForm === true"
-              }
-            ],
-            attrs: {
-              id: _vm.comment.commentable_id,
-              model: _vm.comment.commentable_type,
-              reply: _vm.comment.id,
-              anchor: "form_" + _vm.comment.id
-            },
-            on: {
-              cancelEdit: function($event) {
-                _vm.showForm = false
-              }
-            }
-          })
-        : _vm._e()
-    ],
-    1
+            : _vm._e()
+        ],
+        1
+      )
+    ]
   )
 }
 var staticRenderFns = []
@@ -38342,7 +38427,7 @@ var render = function() {
             { staticClass: "list-group list-group-flush" },
             _vm._l(_vm.comments, function(comment, index) {
               return _c("comment", {
-                key: index,
+                key: "comment_" + index,
                 attrs: { comment: comment, ip: _vm.ip }
               })
             }),
@@ -38354,11 +38439,7 @@ var render = function() {
       ? _c(
           "div",
           { staticClass: "card-footer" },
-          [
-            _c("comment-form", { attrs: { id: _vm.id, model: _vm.model } }),
-            _vm._v(" "),
-            _c("pre", [_vm._v("\t\t\t" + _vm._s(_vm.comments) + "\n\t\t")])
-          ],
+          [_c("comment-form", { attrs: { id: _vm.id, model: _vm.model } })],
           1
         )
       : _vm._e()
@@ -52483,12 +52564,16 @@ var store = new vuex__WEBPACK_IMPORTED_MODULE_1__["default"].Store({
   },
   actions: {
     addComments: function addComments(context, comments) {
-      console.log('store action addComments', comments);
+      //console.log('store action addComments', comments)
       context.commit('ADD_COMMENTS', comments);
     },
     addComment: function addComment(context, comment) {
-      console.log('store action addComment', comment);
+      //console.log('store action addComment', comment)
       context.commit('ADD_COMMENT', comment);
+    },
+    deleteComment: function deleteComment(context, comment) {
+      //console.log('store action addComments', comments)
+      context.commit('DELETE_COMMENT', comment);
     }
   }
 });

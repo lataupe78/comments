@@ -23,25 +23,22 @@
 			</div>
 
 			<div class="list-group list-group-flush" v-else>
-			<comment
-				v-for="(comment, index) in comments"
-				:comment="comment"
-				:ip="ip"
-				:key="index">
-			</comment>
+
+					<comment
+					v-for="(comment, index) in comments"
+					:comment="comment"
+					:ip="ip"
+					:key="'comment_' + index"
+					/>
+
 			</div>
 
+		</div>
+		<div class="card-footer" v-if="!isLoading">
+			<comment-form :id="id" :model="model"></comment-form>
+
+		</div>
 	</div>
-	<div class="card-footer" v-if="!isLoading">
-		<comment-form :id="id" :model="model"></comment-form>
-
-		<pre>
-			{{ comments }}
-		</pre>
-
-
-	</div>
-</div>
 </template>
 <script>
 
@@ -82,6 +79,7 @@
 		data(){
 			return {
 				isLoading: false,
+				isLoaded: false,
 				comments: this.$store.getters.comments
 			}
 		},
@@ -89,21 +87,45 @@
 		mounted(){
 			console.log('Comments mounted');
 
-			console.log(this.$store)
+			//console.log(this.$store)
 
-			this.isLoading = true
-			axios.get('/comments', {
-				params: {
-					id: this.id,
-					type: this.model
+			let onScroll = () => {
+				if(this.isLoaded === false
+					&& (this.$el.getBoundingClientRect().top - window.innerHeight <= 0)
+					){
+					this.isLoaded = true
+					this.loadComments()
+					window.removeEventListener('scroll', onScroll);
 				}
-			}).then((response) => {
-				//this.comments = response.data
-				//this.addComments(response.data)
-				//this.$store.dispatch('ADD_COMMENTS', response.data)
-				this.$store.dispatch('addComments', response.data)
-				this.isLoading = false
-			})
+			}
+
+			window.addEventListener('scroll', onScroll);
+
+		},
+
+		methods:{
+
+			loadComments(){
+
+				this.isLoading = true
+				axios.get('/comments', {
+					params: {
+						id: this.id,
+						type: this.model
+					}
+				}).then((response) => {
+					//this.comments = response.data
+					//this.addComments(response.data)
+					//this.$store.dispatch('ADD_COMMENTS', response.data)
+					this.$store.dispatch('addComments', response.data)
+					this.isLoading = false
+				}).catch((error) => {
+					this.isLoading = false;
+					let errorObject=JSON.parse(JSON.stringify(error));
+					console.error(errorObject)
+				})
+
+			}
 		}
 
 	}

@@ -46,58 +46,23 @@ class StoreCommentRequest extends FormRequest
 
 
         Validator::extend('reply_poly_exists', function ($attribute, $value, $parameters, $validator) {
-            /*
-            dump('value:'.$value);
-            dump('attribute:'.$attribute);
-            dump($parameters);
-            dump($parameters[0]);
-            */
-            if($value === null){
+
+            // ici value est reply_to
+
+            if($value === null){ // commentaire parent, no problem
                 return true;
             }
-            if (! $type = array_get($validator->getData(), $parameters[0], false)) {
-                return false;
-            }
-            /*
-            dump('#1 type passed');
-            dump('type:'.$type);
-            */
-            if (Relation::getMorphedModel($type)) {
-                $type = Relation::getMorphedModel($type);
+            $parent = Comment::select('id', 'reply_to')
+                ->where([
+                    'id' =>  $value,
+                    'commentable_type' =>  $this->commentable_type,
+                    'commentable_id' =>  $this->commentable_id
+                ])
+                ->first();
 
-            }
-            //dump('#2 relation passed');
-            //dump('type:' . $type);
+            // le parent doit bien exister et son reply_to doit être null
+            return (!empty($parent) && $parent->reply_to === null);
 
-            if (! class_exists($type)) {
-                return false;
-            }
-
-            //dump('#3 class_exists passed');
-
-
-            $comment = Comment::where([
-                'commentable_type' => $type,
-                'id' => $value,
-                'reply_to' => null
-            ])->select('id')->get();
-
-            return !empty($comment);
-
-            /*
-            $resolve = resolve($type)->find($value);
-
-            dump(resolve($type));
-            dump($resolve);
-
-            if(! empty($resolve)){
-                return true;
-            }
-
-            dump('#4 resolve passed');
-
-            return false;
-            */
         });
 
         return [
@@ -106,7 +71,7 @@ class StoreCommentRequest extends FormRequest
             'username' => ['required', 'max:255'],
             'commentable_type' => 'required',
             'commentable_id' => ['required', 'poly_exists:commentable_type'],
-            'reply_to' => ['sometimes', 'reply_poly_exists:commentable_type']
+            'reply_to' => ['sometimes', 'reply_poly_exists']
         ];
     }
 
