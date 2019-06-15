@@ -13,6 +13,8 @@ class CommentController extends Controller
 
     public function index(Request $request)
     {
+        sleep(1);
+
         $comments = Comment::allFor(
             $request->input('id'),
             $request->input('type')

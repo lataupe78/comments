@@ -23,22 +23,23 @@
 		</div>
 	</div>
 
-
+	{{--
 	<div class="card my-5 text-white bg-primary">
 		@include('front.comments._list', ['comments' => $post->comments])
 	</div>
+	--}}
 
 	<comments
 		model="{{ get_class($post) }}"
 		:id="{{ $post->id }}"
-		:comments="{{$post->comments }}"
 		ip="{{ md5(request()->ip()) }}" />
 
+		{{-- :comments="{{$post->comments }}" --}}
 
 </div>
 
 @endsection
 
 @section('content_bottom')
-	{{ dump($post->comments) }}
+	{{-- dump($post->comments) --}}
 @endsection
